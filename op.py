@@ -18,7 +18,7 @@ operators = [
         "China Mobile",
         "China",
         "member_inactive",
-        997,
+        1009,
         "B3",  # 2024/06/11 追加
         "B8",  # 2024/06/11 追加
         "B34",
@@ -27,13 +27,14 @@ operators = [
         "B41",
         "n28", # 2025/07/30 https://www.frequencycheck.com/carriers
         "n41",  # 2024/06/11 修正 n78を消去
+        "n77", # 2025/12/17 追加
         "n79",
     ),
     Operator(
         "Bharti Airtel",
         "India",
         "member_active",
-        390, # udapted 2025/6/12
+        487, # udapted 2025/6/12
         "B3",
         "B5",
         "B8",
@@ -47,7 +48,7 @@ operators = [
         "Reliance Jio",
         "India",
         "member_active",
-        470, # udapted 2025/6/12 https://www.business-standard.com/industry/news/reliance-jio-leads-mobile-subscriber-additions-in-march-trai-data-125050701676_1.html
+        490, # udapted 2025/6/12 https://www.business-standard.com/industry/news/reliance-jio-leads-mobile-subscriber-additions-in-march-trai-data-125050701676_1.html
         "B3", # 2025/7/30 追加 https://www.frequencycheck.com/carriers
         "B5", # 2025/7/30 追加 https://www.frequencycheck.com/carriers
         "n3", # 2025/5/8 B3からn3に修正
@@ -61,11 +62,12 @@ operators = [
         "China Telecom",
         "China",
         "member_inactive",
-        413,
+        435,
         "B1",  # 2024/6/11 追加修正
         "B3",
         "B5",
         "B40", # 2025/7/30 B41からB40に修正 
+        "B41", # 2025/12/17 B41のLTEサポート残りあり
         "n1",  # 2024/6/11 追加修正
         "n5",  # 2025/7/30 追加 https://www.frequencycheck.com/carriers
         "n78",
@@ -74,7 +76,7 @@ operators = [
         "China Unicom",
         "China",
         "member_inactive",
-        333,
+        340,
         "B1",  # 2024/6/11 追加修正
         "B3",
         "B5", # 2025/5/8 B8からB5に修正
@@ -139,7 +141,7 @@ operators = [
         "n78",
         "n258",
     ),
-    Operator("Orange", "France", "member_active", 243, "B1", "B3", "B7", "B20", "B28", "n1","n78",),
+    Operator("Orange", "France", "member_active", 243, "B1", "B3", "B7", "B20", "B28", "n1","n3", "n78",), # 20225/12/17 n3 added
     Operator(
         "Vodafone Idea",
         "India",
@@ -151,13 +153,13 @@ operators = [
         "B40",
         "B41",
         "n78",
-        "n258",
+        # "n258", 2025/12/17 商用非展開で削除
     ),  # https://www.lightreading.com/open-ran/vodafone-idea-launches-open-ran-pilot-in-india-with-mavenir 2024/3/14 added
     Operator(
         "AT&T",
         "United States",
         "member_active",
-        217,
+        235,
         "B2",
         "B4",
         "B5",
@@ -204,7 +206,7 @@ operators = [
         "n40",
         "n1",
     ),
-    Operator("Telenor", "Norway", "non_member", 93, "B3", "B7", "B20"),
+    Operator("Telenor", "Norway", "non_member", 93, "B3", "B7", "B20", "n78"), # 2025/12/17 n78 added
     Operator("Celcomdigi", "Malaysia", "non_member", 163, "B1", "B3", "B7", "n26", "n28", "n78"),
     Operator("du", "UAE", "non_member", 159, "B3", "B1", "B8", "B20", "B28", "n78"),
     Operator(
@@ -229,14 +231,14 @@ operators = [
         "n260",
         "n261",
     ),  # duplicated n77 was removed 2024/3/25
-    Operator("Vodacom", "South Africa", "non_member", 155, "B8", "B3", "B42"),
-    Operator("Ooredoo", "Qatar", "non_member", 121, "B3", "B8", "B1"),
+    Operator("Vodacom", "South Africa", "non_member", 155, "B8", "B3", "B42", "n78"), #2025/12/17 n78 added
+    Operator("Ooredoo", "Qatar", "non_member", 121, "B3", "B8", "B1", "n78"), #2025/12/17 n78 added
     # T-Mobile may be part of Deutche Telecom, but left as it is
     Operator(
         "T-Mobile",
         "United States",
         "member_active",
-        121,
+        135,
         "B2",
         "B12",
         "B71",
@@ -245,12 +247,12 @@ operators = [
         "B66",
         "n71",
         "n41",
-        "n258",
+        # "n258", 2025/12/17 商用未展開とのこと
         "n260",
         "n261",
     ),
     Operator(
-        "Viettel", "Vietnam", "non_member", 110, "B3", ), 
+        "Viettel", "Vietnam", "non_member", 110, "B3", "n78"), # 2025/12/17 n78 added 
     Operator("BSNL Mobile", "India", "non_member", 89.6, "B3", "B5", "B28", "B1", "B41", "n28", "n78", "n258"), # updated 2025/7/30
     Operator(
         "CMHK", "Hong Kong", "non_member", 120,  "B3", "B7", "B40", "n1", "n78", "n79"
@@ -275,7 +277,7 @@ operators = [
         "NTT Docomo",
         "Japan",
         "member_active",
-        91, #updated 2025/6/12
+         87, #updated 2025/12/17
         "B28",
         "B18",
         "B26",
@@ -297,7 +299,7 @@ operators = [
         "Rakuten Mobile",
         "Japan",
         "member_active",
-        8.6, #updated 2025/6/12
+        7, #updated 2025/12/17
         "B3",
         "B18",
         "B28",
@@ -307,12 +309,12 @@ operators = [
     ),
     Operator("Globe Telecom", "Philippines", "non_member", 54, "B28", "B3", "B7", "B41", "n41", "n78"),
     Operator("Smart", "Philippines", "non_member", 53, "B1", "B3", "B5", "B28", "B40", "B41", "n28", "n41", "n78"),
-    Operator("MegaFon", "Russia", "non_member", 71, "B1", "B3", "B7", "B8", "B34", "B41", "n1", "n7", "n257", "n258"),
+    Operator("MegaFon", "Russia", "non_member", 71, "B1", "B3", "B7", "B8", "B34", "B41", "n1", "n7", "n78", "n257", "n258"), #2025/12/17 n78 added
     Operator(
         "KDDI",
         "Japan",
         "member_active",
-        70, #updated 2025/6/12
+        69, #updated 2025/12/17
         "B28",
         "B18",
         "B26",
@@ -334,7 +336,7 @@ operators = [
         "Softbank",
         "Japan",
         "member_active",
-        55, #updated 2025/6/12
+        52, #updated 2025/12/17
         "B12",
         "B28",
         "B17",
@@ -354,6 +356,7 @@ operators = [
         "B42",
         "B41",
         "n77",
+        "n79",  # 2025/12/17 一部導入中により追加
         "n257",
     ),  # 4G確度高い Softbank web
     Operator(
