@@ -40,6 +40,8 @@ operators = [
         "B8",
         "B1",
         "B40",
+        "n1", # udapted 2026/1/28 5Gとしてリファーミング進行中とのこと
+        "n40", # udapted 2026/1/28 5Gとしてリファーミング進行中とのこと
         # "n28", 2025/5/8 削除
         "n78",
         "n258",
@@ -277,7 +279,7 @@ operators = [
         "NTT Docomo",
         "Japan",
         "member_active",
-         87, #updated 2025/12/17
+         92, #updated 2026/1/28
         "B28",
         "B18",
         "B26",
