@@ -34,7 +34,7 @@ operators = [
         "Bharti Airtel",
         "India",
         "member_active",
-        487, # udapted 2025/6/12
+        472, # updated 2026/4/2 インド国内wireless（TRAI 2026/2末472.65M）。グローバル合計は650M（India 368M + Africa 182M）
         "B3",
         "B5",
         "B8",
@@ -50,7 +50,7 @@ operators = [
         "Reliance Jio",
         "India",
         "member_active",
-        490, # udapted 2025/6/12 https://www.business-standard.com/industry/news/reliance-jio-leads-mobile-subscriber-additions-in-march-trai-data-125050701676_1.html
+        493, # updated 2026/4/2 インド国内wireless（TRAI 2026/2末493.11M）
         "B3", # 2025/7/30 追加 https://www.frequencycheck.com/carriers
         "B5", # 2025/7/30 追加 https://www.frequencycheck.com/carriers
         "n3", # 2025/5/8 B3からn3に修正
@@ -148,7 +148,7 @@ operators = [
         "Vodafone Idea",
         "India",
         "member_active",
-        205, # udapted 2025/6/12
+        198, # updated 2026/4/2 インド国内wireless（TRAI 2026/2末198.38M）
         "B3",
         "B8",
         "B1",
@@ -255,7 +255,7 @@ operators = [
     ),
     Operator(
         "Viettel", "Vietnam", "non_member", 110, "B3", "n78"), # 2025/12/17 n78 added 
-    Operator("BSNL Mobile", "India", "non_member", 89.6, "B3", "B5", "B28", "B1", "B41", "n28", "n78", "n258"), # updated 2025/7/30
+    Operator("BSNL Mobile", "India", "non_member", 93, "B3", "B5", "B28", "B1", "B41", "n28", "n78", "n258"), # updated 2026/4/2 （TRAI 2026/2末92.93M）
     Operator(
         "CMHK", "Hong Kong", "non_member", 120,  "B3", "B7", "B40", "n1", "n78", "n79"
     ),
@@ -301,7 +301,7 @@ operators = [
         "Rakuten Mobile",
         "Japan",
         "member_active",
-        7, #updated 2025/12/17
+        10, #updated 2026/4/2 （2025/12/25公式発表 10M突破）
         "B3",
         "B18",
         "B28",
@@ -316,7 +316,7 @@ operators = [
         "KDDI",
         "Japan",
         "member_active",
-        69, #updated 2025/12/17
+        71, #updated 2026/4/2 （2025年Q2 71.46M）
         "B28",
         "B18",
         "B26",
@@ -338,7 +338,7 @@ operators = [
         "Softbank",
         "Japan",
         "member_active",
-        52, #updated 2025/12/17
+        56, #updated 2026/4/2 （2025年Q2 56.38M）
         "B12",
         "B28",
         "B17",
