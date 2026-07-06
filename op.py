@@ -64,7 +64,7 @@ operators = [
         "China Telecom",
         "China",
         "member_inactive",
-        435,
+        440.55, # updated 2026/7/6 (2026/3/31時点) https://www.marbridgeconsulting.com/marbridgedaily/2026-04-24/article/115242/chinas_three_main_telcos_report_q1_2026_subscriber_totals
         "B1",  # 2024/6/11 追加修正
         "B3",
         "B5",
@@ -102,19 +102,31 @@ operators = [
         "Telcel", # 2025/7/30 America MovilをTelcelに変更
         "Mexico",
         "non_member",
-        312,
+        84.3, # updated 2026/7/6 メキシコ国内のみに統一（旧312はAmérica Móvilグループ全体の値だった） https://www.tipranks.com/news/company-announcements/america-movil-posts-strong-1q-2026-profit-growth-as-postpaid-and-broadband-drive-expansion
         "B4",
         "B66", # 2025/5/9 削除 → 2025/7/30 復帰 https://www.frequencycheck.com/carriers
-        "n5", 
+        "n5",
+        "B7", # 2026/7/6 追加 https://www.frequencycheck.com/carriers
+        "n78", # 2026/7/6 追加(主力5G帯) https://www.rcrwireless.com/20220211/business/mexican-telecoms-regulator-paves-way-america-movil-5g-launch
     ),
     Operator(
-        "MTN", "South Africa", "non_member", 287, "B3", "n78",
+        "MTN",
+        "South Africa",
+        "non_member",
+        39.8, # updated 2026/7/6 南ア国内のみに統一（旧287はアフリカ/中東19市場のMTN Group全体の値だった） https://mtn-investor.com/reporting/interims-2025/results-overview.php
+        "B1", # 2026/7/6 追加 https://www.frequencycheck.com/carriers/mtn-group-south-africa
+        "B3",
+        "B8", # 2026/7/6 追加 https://www.frequencycheck.com/carriers/mtn-group-south-africa
+        "n78",
+        "n1", # 2026/7/6 追加 https://www.frequencycheck.com/carriers/mtn-group-south-africa
+        "n3", # 2026/7/6 追加 https://www.frequencycheck.com/carriers/mtn-group-south-africa
+        "n28", # 2026/7/6 追加 https://www.frequencycheck.com/carriers/mtn-group-south-africa
     ), # 2025/7/30 削除  https://www.frequencycheck.com/carriers
     Operator(
         "Vodafone Group",
         "UK",
         "member_active",
-        323,
+        28.6, # updated 2026/7/6 英国内のみに統一（旧323はグループ全体の値だった）。2025/5のVodafoneThree統合(Vodafone51%/CK Hutchison49%)後の合算値でThree由来の顧客を含む https://www.ispreview.co.uk/index.php/2026/02/vodafonethree-top-1-77-million-uk-broadband-users-as-mobile-shrinks-to-28-6m.html
         "B1",
         "B3",
         "B7",
@@ -127,10 +139,10 @@ operators = [
         "n78",
     ),
     Operator(
-        "Movistar", # 2025/7/30 Telefonicaから変更  https://www.frequencycheck.com/carriers 
+        "Movistar", # 2025/7/30 Telefonicaから変更  https://www.frequencycheck.com/carriers
         "Spain",
         "member_active",
-        299,
+        16.5, # updated 2026/7/6 スペイン国内のみに統一（旧299はTelefónicaグループ全体の値だった） CNMC 2025/12末 シェア26.24%×63.0M回線 https://www.cnmc.es/prensa/datos-diciembre-telecos-20260219
         "B1",
         "B3",
         "B7",
@@ -143,7 +155,8 @@ operators = [
         "n78",
         "n258",
     ),
-    Operator("Orange", "France", "member_active", 243, "B1", "B3", "B7", "B20", "B28", "n1","n3", "n78",), # 20225/12/17 n3 added
+    Operator("Orange", "France", "member_active", 22, "B1", "B3", "B7", "B20", "B28", "n1","n3", "n78",), # 20225/12/17 n3 added
+    # 2026/7/6 フランス国内のみに統一（旧243はOrangeグループ全体26カ国の値だった）。ARCEPは事業者別の契約者数を公表していないため、bonforfait.frの推定値(2025年末)を暫定使用。要確度改善 https://bonforfait.fr/
     Operator(
         "Vodafone Idea",
         "India",
@@ -184,7 +197,7 @@ operators = [
         "Deutsche Telekom",
         "Germany",
         "member_active",
-        256,
+        75.3, # updated 2026/7/6 ドイツ国内のみに統一（旧256はグループ全体の値だった） https://report.telekom.com/interim-report-q1-2026/management-report/development-of-business-in-the-operating-segments/germany.html
         "B1",
         "B3",
         "B7",
@@ -194,6 +207,7 @@ operators = [
         "B32",
         "n1",
         "n3",
+        "n28", # 2026/7/6 追加 https://www.telekom.com/en/media/media-information/archive/telekom-5g-transmits-on-700-mhz-1008600
         "n77",
         "n78",
     ),
@@ -208,9 +222,22 @@ operators = [
         "n40",
         "n1",
     ),
-    Operator("Telenor", "Norway", "non_member", 93, "B3", "B7", "B20", "n78"), # 2025/12/17 n78 added
+    Operator("Telenor", "Norway", "non_member", 2.54, "B3", "B7", "B20", "n78"), # 2025/12/17 n78 added
+    # 2026/7/6 ノルウェー国内のみに統一（旧93はグループ全体(北欧+アジア)の値だった） Telenor Q4/FY2025 https://www.telenor.com/binaries/investors/reports-and-information/quarterly/2025/Report-Q4-and-Full-Year-2025.pdf
     Operator("Celcomdigi", "Malaysia", "non_member", 163, "B1", "B3", "B7", "n26", "n28", "n78"),
-    Operator("du", "UAE", "non_member", 159, "B3", "B1", "B8", "B20", "B28", "n78"),
+    Operator(
+        "du",
+        "UAE",
+        "non_member",
+        9.7, # 2026/7/6 修正 159は誤記(他事業者と混同と推定) UAE国内のみ https://techafricanews.com/2026/03/04/uae-telecom-operator-du-sustains-growth-with-9-7m-mobile-subscribers/
+        "B3",
+        "B1",
+        "B8",
+        "B20",
+        "B28",
+        "n78",
+        "n41", # 2026/7/6 追加 https://www.rcrwireless.com/20250925/5g/du-5g-uae
+    ),
     Operator(
         "KPN", "Netherlands", "non_member", 157, "B3", "B7", "B20", "B38", "n1", "n78", "n28"
     ),
@@ -218,7 +245,7 @@ operators = [
         "Verizon",
         "United States",
         "member_active",
-        143,
+        146.8, # updated 2026/7/6 (2026/3/31 retail connections) https://www.verizon.com/about/sites/default/files/Verizon_Fact_Sheet.pdf
         "B13",
         "B2",
         "B4",
@@ -233,14 +260,15 @@ operators = [
         "n260",
         "n261",
     ),  # duplicated n77 was removed 2024/3/25
-    Operator("Vodacom", "South Africa", "non_member", 155, "B8", "B3", "B42", "n78"), #2025/12/17 n78 added
+    Operator("Vodacom", "South Africa", "non_member", 46, "B8", "B3", "B42", "n78"), #2025/12/17 n78 added
+    # 2026/7/6 南ア国内のみに統一（旧155はグループ全体8市場の値だった） Vodacom FY2025 https://www.vodacom.com/pdf/investor/annual-results/2025/results-booklet.pdf B42は南ア国内での独立LTE展開が未確認、要確認
     Operator("Ooredoo", "Qatar", "non_member", 121, "B3", "B8", "B1", "n78"), #2025/12/17 n78 added
     # T-Mobile may be part of Deutche Telecom, but left as it is
     Operator(
         "T-Mobile",
         "United States",
         "member_active",
-        135,
+        130.9, # updated 2026/7/6 (2026 Q1 total customer connections)
         "B2",
         "B12",
         "B71",

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Operators and Countries</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<style>
+:root {
+    --primary: #4f46e5;
+    --primary-light: #e0e7ff;
+    --bg: #f8fafc;
+    --sidebar-bg: #f1f5f9;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+#app { display: grid; grid-template-columns: 290px 1fr; min-height: 100vh; }
+#sidebar { background: var(--sidebar-bg); border-right: 1px solid var(--border); padding: 24px 16px; overflow-y: auto; position: sticky; top: 0; height: 100vh; }
+#sidebar h2 { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+#main { padding: 32px 40px; max-width: 900px; }
+#main h1 { font-size: 26px; font-weight: 700; margin-bottom: 28px; }
+.section { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; }
+.section h2 { font-size: 17px; font-weight: 600; color: var(--primary); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid var(--primary-light); }
+label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+input[type="number"] { width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; color: var(--text); background: white; outline: none; }
+input[type="number"]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+.result-item { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 13px; margin-top: 10px; }
+.result-item p { margin-bottom: 6px; }
+.result-item p:last-child { margin-bottom: 0; }
+.band-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.bt { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 12px; font-family: monospace; font-weight: 700; }
+.bt-lte { background: #dbeafe; color: #1e40af; }
+.bt-nr  { background: #f3e8ff; color: #6b21a8; }
+.bt-op  { background: #f1f5f9; color: #334155; font-family: inherit; font-weight: 500; font-size: 12px; }
+.badge { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 11px; font-weight: 700; margin-left: 7px; vertical-align: middle; }
+.badge-active { background: #d1fae5; color: #065f46; }
+.badge-member { background: #fef3c7; color: #92400e; }
+.common-block { margin-top: 14px; padding: 13px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius); }
+.no-common { margin-top: 14px; padding: 13px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius); font-size: 13px; }
+.freq-result { margin-top: 10px; padding: 10px; background: var(--primary-light); border-radius: var(--radius); font-size: 13px; }
+.sidebar-section { margin-bottom: 22px; }
+details { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+summary { padding: 9px 13px; cursor: pointer; font-size: 13px; font-weight: 500; background: var(--bg); user-select: none; list-style: none; }
+summary::before { content: '▶ '; font-size: 10px; color: var(--muted); }
+details[open] summary::before { content: '▼ '; }
+details[open] summary { border-bottom: 1px solid var(--border); }
+.details-body { padding: 12px 13px; font-size: 13px; color: var(--muted); line-height: 1.75; }
+.details-body a { color: var(--primary); }
+.not-found { color: var(--muted); font-style: italic; font-size: 13px; }
+@media (max-width: 768px) { #app { grid-template-columns: 1fr; } #sidebar { position: static; height: auto; } #main { padding: 20px 16px; } }
+</style>
+</head>
+<body>
+<div id="app">
+
+<aside id="sidebar">
+  <div class="sidebar-section">
+    <h2>Frequency → Band</h2>
+    <label for="freq-input">Frequency in MHz</label>
+    <input type="number" id="freq-input" value="2150" min="0" max="200000">
+    <div id="freq-result"></div>
+  </div>
+
+  <div class="sidebar-section">
+    <label>Band → Frequency</label>
+    <select id="band-freq-select" multiple placeholder="Select band(s)..."></select>
+    <div id="band-freq-result"></div>
+  </div>
+
+  <details>
+    <summary>Main and sub bands</summary>
+    <div class="details-body">LTE/4G bands start with 'B' and 5G with 'n' and are called main bands. One OEM uses sub-bands such as 'B42C' to describe partial coverage of the main band. The left menu covers both main and sub-bands. The right main area covers main bands only, as sub-band and operator/country relationships are not publicly known.</div>
+  </details>
+</aside>
+
+<main id="main">
+  <h1>Find Operators and Countries</h1>
+
+  <div class="section">
+    <h2>Band and Operators</h2>
+    <label>Which LTE/5G band?</label>
+    <select id="bands-select" multiple placeholder="Select band(s)..."></select>
+    <div id="bands-result"></div>
+    <details>
+      <summary>Can not find your band?</summary>
+      <div class="details-body">If an operator is migrating from LTE to 5G, they may appear with a B number but not yet an n number. Sub-bands (B42A, B78G, etc.) are not included here as the operator/region mapping is not publicly available. New bands such as n104 do not appear if not yet used by any tracked carrier.</div>
+    </details>
+  </div>
+
+  <div class="section">
+    <h2>Operator Profile</h2>
+    <label>Which operator?</label>
+    <select id="operators-select" multiple placeholder="Select operator(s)..."></select>
+    <div id="operators-result"></div>
+  </div>
+
+  <div class="section">
+    <h2>Operators per Country</h2>
+    <label>Which country?</label>
+    <select id="countries-select" multiple placeholder="Select country(ies)..."></select>
+    <div id="countries-result"></div>
+  </div>
+
+  <details>
+    <summary>Source and coverage</summary>
+    <div class="details-body">
+      This app covers the top 36 mobile operators. In 2024, there were 8.6 billion worldwide subscribers; these 36 operators represent ~84% of all subscribers.<br><br>
+      <a href="https://www.ericsson.com/en/reports-and-papers/mobility-report/dataforecasts/mobile-subscriptions-outlook" target="_blank">Ericsson Mobility Report</a> (Highly recommended)<br>
+      <a href="https://www.frequencycheck.com/carriers" target="_blank">frequencycheck.com/carriers</a><br>
+      <a href="https://en.wikipedia.org/wiki/List_of_mobile_network_operators" target="_blank">Wikipedia: Mobile network operators</a><br>
+      <a href="https://en.wikipedia.org/wiki/LTE_frequency_bands" target="_blank">Wikipedia: LTE frequency bands</a><br>
+      <a href="https://en.wikipedia.org/wiki/5G_NR_frequency_bands" target="_blank">Wikipedia: 5G NR frequency bands</a>
+    </div>
+  </details>
+</main>
+</div>
+
+<script>
+// ── DATA ────────────────────────────────────────────────
+const bands = [
+  {name:"B1",   min:2110,   max:2170,   d:"FDD"},{name:"B1A",  min:2110,   max:2130,   d:"FDD"},
+  {name:"B1B",  min:2110,   max:2165,   d:"FDD"},{name:"B1C",  min:2150,   max:2170,   d:"FDD"},
+  {name:"B2",   min:1930,   max:1990,   d:"FDD"},{name:"B3",   min:1805,   max:1880,   d:"FDD"},
+  {name:"B3A",  min:1830,   max:1880,   d:"FDD"},{name:"B3B",  min:1805,   max:1860,   d:"FDD"},
+  {name:"B3C",  min:1839.9, max:1879.9, d:"FDD"},{name:"B3D",  min:1810,   max:1870,   d:"FDD"},
+  {name:"B3E",  min:1805,   max:1830,   d:"FDD"},{name:"B3F",  min:1805,   max:1825,   d:"FDD"},
+  {name:"B3G",  min:1845,   max:1880,   d:"FDD"},{name:"B3H",  min:1845,   max:1860,   d:"FDD"},
+  {name:"B3J",  min:1805,   max:1845,   d:"FDD"},{name:"B4",   min:2110,   max:2155,   d:"FDD"},
+  {name:"B5",   min:869,    max:894,    d:"FDD"},{name:"B7",   min:2620,   max:2690,   d:"FDD"},
+  {name:"B7A",  min:2620,   max:2680,   d:"FDD"},{name:"B7B",  min:2640,   max:2690,   d:"FDD"},
+  {name:"B8",   min:925,    max:960,    d:"FDD"},{name:"B11",  min:1475.9, max:1495.9, d:"FDD"},
+  {name:"B12",  min:729,    max:746,    d:"FDD"},{name:"B12A", min:729,    max:745,    d:"FDD"},
+  {name:"B13",  min:746,    max:756,    d:"FDD"},{name:"B14",  min:758,    max:768,    d:"FDD"},
+  {name:"B17",  min:734,    max:746,    d:"FDD"},{name:"B18",  min:860,    max:875,    d:"FDD"},
+  {name:"B19",  min:875,    max:890,    d:"FDD"},{name:"B20",  min:791,    max:821,    d:"FDD"},
+  {name:"B21",  min:1495.9, max:1510.9, d:"FDD"},{name:"B25",  min:1930,   max:1995,   d:"FDD"},
+  {name:"B26",  min:859,    max:894,    d:"FDD"},{name:"B28",  min:758,    max:803,    d:"FDD"},
+  {name:"B28A", min:773,    max:803,    d:"FDD"},{name:"B28B", min:758,    max:788,    d:"FDD"},
+  {name:"B28C", min:768,    max:798,    d:"FDD"},{name:"B28D", min:773,    max:783,    d:"FDD"},
+  {name:"B28E", min:761,    max:791,    d:"FDD"},{name:"B28F", min:758,    max:791,    d:"FDD"},
+  {name:"B28G", min:758,    max:798,    d:"FDD"},{name:"B28H", min:758,    max:788,    d:"FDD"},
+  {name:"B29",  min:717,    max:728,    d:"FDD"},{name:"B30",  min:2350,   max:2360,   d:"FDD"},
+  {name:"B38",  min:2570,   max:2620,   d:"TDD"},{name:"B38A", min:2575,   max:2615,   d:"TDD"},
+  {name:"B38B", min:2575,   max:2595,   d:"TDD"},{name:"B39",  min:1880,   max:1920,   d:"TDD"},
+  {name:"B40",  min:2300,   max:2400,   d:"TDD"},{name:"B41",  min:2496,   max:2690,   d:"TDD"},
+  {name:"B41A", min:2496,   max:2658,   d:"TDD"},{name:"B41B", min:2595,   max:2645,   d:"TDD"},
+  {name:"B41C", min:2535,   max:2655,   d:"TDD"},{name:"B41D", min:2535,   max:2575,   d:"TDD"},
+  {name:"B41E", min:2675,   max:2635,   d:"TDD"},{name:"B41F", min:2635,   max:2675,   d:"TDD"},
+  {name:"B41G", min:2535,   max:2675,   d:"TDD"},{name:"B41H", min:2545,   max:2645,   d:"TDD"},
+  {name:"B41J", min:2618,   max:2690,   d:"TDD"},{name:"B41K", min:2515,   max:2675,   d:"TDD"},
+  {name:"B41L", min:2545,   max:2575,   d:"TDD"},{name:"B41M", min:2590,   max:2690,   d:"TDD"},
+  {name:"B41N", min:2496,   max:2690,   d:"TDD"},{name:"B41Q", min:2545,   max:2595,   d:"TDD"},
+  {name:"B42",  min:3400,   max:3600,   d:"TDD"},{name:"B42A", min:3480,   max:3600,   d:"TDD"},
+  {name:"B42B", min:3480,   max:3650,   d:"TDD"},{name:"B42C", min:3560,   max:3600,   d:"TDD"},
+  {name:"B42D", min:3500,   max:3600,   d:"TDD"},{name:"B42E", min:3400,   max:3500,   d:"TDD"},
+  {name:"B42F", min:3420,   max:3600,   d:"TDD"},{name:"B42G", min:3410,   max:3600,   d:"TDD"},
+  {name:"B42H", min:3450,   max:3600,   d:"TDD"},{name:"B42J", min:3400,   max:3580,   d:"TDD"},
+  {name:"B42K", min:3480,   max:3520,   d:"TDD"},{name:"B42L", min:3520,   max:3560,   d:"TDD"},
+  {name:"B43",  min:3600,   max:3800,   d:"TDD"},{name:"B46",  min:5150,   max:5925,   d:"TDD"},
+  {name:"B66",  min:2110,   max:2200,   d:"FDD"},{name:"B66A", min:2110,   max:2180,   d:"FDD"},
+  {name:"B66B", min:2110,   max:2155,   d:"FDD"},{name:"B71",  min:617,    max:652,    d:"FDD"},
+  {name:"B75",  min:1432,   max:1517,   d:"FDD"},{name:"B77",  min:3300,   max:4200,   d:"TDD"},
+  {name:"B77A", min:3900,   max:4000,   d:"TDD"},{name:"B77B", min:3800,   max:4000,   d:"TDD"},
+  {name:"B77C", min:3900,   max:4100,   d:"TDD"},{name:"B77D", min:3700,   max:3980,   d:"TDD"},
+  {name:"B77E", min:3700,   max:3800,   d:"TDD"},{name:"B77F", min:3400,   max:4000,   d:"TDD"},
+  {name:"B77G", min:3450,   max:3550,   d:"TDD"},{name:"B77H", min:3700,   max:4000,   d:"TDD"},
+  {name:"B77K", min:3700,   max:3900,   d:"TDD"},{name:"B77L", min:3500,   max:4000,   d:"TDD"},
+  {name:"B77M", min:3840,   max:3980,   d:"TDD"},{name:"B77N", min:3400,   max:3600,   d:"TDD"},
+  {name:"B78",  min:3300,   max:3800,   d:"TDD"},{name:"B78A", min:3300,   max:3600,   d:"TDD"},
+  {name:"B78AA",min:3300,   max:3670,   d:"TDD"},{name:"B78AB",min:3300,   max:3630,   d:"TDD"},
+  {name:"B78AC",min:3480,   max:3520,   d:"TDD"},{name:"B78AD",min:3520,   max:3560,   d:"TDD"},
+  {name:"B78B", min:3500,   max:3600,   d:"TDD"},{name:"B78C", min:3500,   max:3700,   d:"TDD"},
+  {name:"B78D", min:3400,   max:3600,   d:"TDD"},{name:"B78E", min:3400,   max:3500,   d:"TDD"},
+  {name:"B78F", min:3420,   max:3600,   d:"TDD"},{name:"B78G", min:3600,   max:3800,   d:"TDD"},
+  {name:"B78H", min:3542,   max:3700,   d:"TDD"},{name:"B78J", min:3410,   max:3600,   d:"TDD"},
+  {name:"B78K", min:3420,   max:3800,   d:"TDD"},{name:"B78L", min:3500,   max:3800,   d:"TDD"},
+  {name:"B78M", min:3450,   max:3650,   d:"TDD"},{name:"B78N", min:3550,   max:3700,   d:"TDD"},
+  {name:"B78Q", min:3300,   max:3500,   d:"TDD"},{name:"B78R", min:3420,   max:3650,   d:"TDD"},
+  {name:"B78S", min:3700,   max:3800,   d:"TDD"},{name:"B78T", min:3410,   max:3610,   d:"TDD"},
+  {name:"B78U", min:3300,   max:3650,   d:"TDD"},{name:"B78V", min:3410,   max:3800,   d:"TDD"},
+  {name:"B78W", min:3300,   max:3580,   d:"TDD"},{name:"B78Y", min:3300,   max:3800,   d:"TDD"},
+  {name:"B78Z", min:3300,   max:3620,   d:"TDD"},{name:"B79",  min:4400,   max:5000,   d:"TDD"},
+  {name:"B79A", min:4800,   max:5000,   d:"TDD"},{name:"B79B", min:4800,   max:4900,   d:"TDD"},
+  {name:"B79C", min:4400,   max:4900,   d:"TDD"},{name:"B79D", min:4700,   max:5000,   d:"TDD"},
+  {name:"B85",  min:728,    max:746,    d:"FDD"},
+  // 5G NR
+  {name:"n1",   min:2110,   max:2170,   d:"FDD"},{name:"n2",   min:1930,   max:1990,   d:"FDD"},
+  {name:"n3",   min:1805,   max:1880,   d:"FDD"},{name:"n5",   min:869,    max:894,    d:"FDD"},
+  {name:"n7",   min:2620,   max:2690,   d:"FDD"},{name:"n8",   min:925,    max:960,    d:"FDD"},
+  {name:"n20",  min:791,    max:821,    d:"FDD"},{name:"n24",  min:1525,   max:1559,   d:"FDD"},
+  {name:"n25",  min:1930,   max:1995,   d:"FDD"},{name:"n26",  min:859,    max:894,    d:"FDD"},
+  {name:"n28",  min:758,    max:803,    d:"FDD"},{name:"n30",  min:2350,   max:2360,   d:"FDD"},
+  {name:"n34",  min:2010,   max:2025,   d:"TDD"},{name:"n38",  min:2570,   max:2620,   d:"TDD"},
+  {name:"n40",  min:2300,   max:2400,   d:"TDD"},{name:"n41",  min:2496,   max:2690,   d:"TDD"},
+  {name:"n46",  min:5150,   max:5925,   d:"TDD"},{name:"n66",  min:2110,   max:2200,   d:"FDD"},
+  {name:"n71",  min:617,    max:652,    d:"FDD"},{name:"n77",  min:3300,   max:4200,   d:"TDD"},
+  {name:"n78",  min:3300,   max:3800,   d:"TDD"},{name:"n79",  min:4400,   max:5000,   d:"TDD"},
+  {name:"n96",  min:5925,   max:7125,   d:"TDD"},{name:"n102", min:5925,   max:6425,   d:"TDD"},
+  {name:"n104", min:6425,   max:7125,   d:"TDD"},{name:"n257", min:26500,  max:29500,  d:"TDD"},
+  {name:"n258", min:24250,  max:27500,  d:"TDD"},{name:"n260", min:37000,  max:40000,  d:"TDD"},
+  {name:"n261", min:27500,  max:28350,  d:"TDD"},
+];
+
+const operators = [
+  {name:"China Mobile",     hq:"China",         oran:"member_inactive", sub:1009, bands:["B3","B8","B34","B39","B40","B41","n28","n41","n77","n79"]},
+  {name:"Bharti Airtel",    hq:"India",         oran:"member_active",   sub:472,  bands:["B3","B5","B8","B1","B40","n1","n40","n78","n258"]},
+  {name:"Reliance Jio",     hq:"India",         oran:"member_active",   sub:493,  bands:["B3","B5","n3","n5","B40","n28","n78","n258"]},
+  {name:"China Telecom",    hq:"China",         oran:"member_inactive", sub:440.55,bands:["B1","B3","B5","B40","B41","n1","n5","n78"]},
+  {name:"China Unicom",     hq:"China",         oran:"member_inactive", sub:340,  bands:["B1","B3","B5","B8","B40","n1","n8","n78"]},
+  {name:"China Broadcast",  hq:"China",         oran:"member_inactive", sub:105,  bands:["B28","n28","n77","n79"]},
+  {name:"Telcel",           hq:"Mexico",        oran:"non_member",      sub:84.3, bands:["B4","B66","n5","B7","n78"]},
+  {name:"MTN",              hq:"South Africa",  oran:"non_member",      sub:39.8, bands:["B1","B3","B8","n78","n1","n3","n28"]},
+  {name:"Vodafone Group",   hq:"UK",            oran:"member_active",   sub:28.6, bands:["B1","B3","B7","B8","B20","B32","B38","n1","n8","n78"]},
+  {name:"Movistar",         hq:"Spain",         oran:"member_active",   sub:16.5, bands:["B1","B3","B7","B8","B28","B20","n28","n3","n1","n78","n258"]},
+  {name:"Orange",           hq:"France",        oran:"member_active",   sub:22,   bands:["B1","B3","B7","B20","B28","n1","n3","n78"]},
+  {name:"Vodafone Idea",    hq:"India",         oran:"member_active",   sub:198,  bands:["B3","B8","B1","B40","B41","n78"]},
+  {name:"AT&T",             hq:"United States", oran:"member_active",   sub:235,  bands:["B2","B4","B5","B12","B14","B17","B29","B30","B46","B48","B66","n2","n5","n66","n77","n260","n261"]},
+  {name:"Deutsche Telekom", hq:"Germany",       oran:"member_active",   sub:75.3, bands:["B1","B3","B7","B8","B20","B28","B32","n1","n3","n28","n77","n78"]},
+  {name:"Telecomsel",       hq:"Indonesia",     oran:"non_member",      sub:159,  bands:["B3","B8","B40","n40","n1"]},
+  {name:"Telenor",          hq:"Norway",        oran:"non_member",      sub:2.54, bands:["B3","B7","B20","n78"]},
+  {name:"Celcomdigi",       hq:"Malaysia",      oran:"non_member",      sub:163,  bands:["B1","B3","B7","n26","n28","n78"]},
+  {name:"du",               hq:"UAE",           oran:"non_member",      sub:9.7,  bands:["B3","B1","B8","B20","B28","n78","n41"]},
+  {name:"KPN",              hq:"Netherlands",   oran:"non_member",      sub:157,  bands:["B3","B7","B20","B38","n1","n78","n28"]},
+  {name:"Verizon",          hq:"United States", oran:"member_active",   sub:146.8,bands:["B13","B2","B4","B5","B46","B48","B66","n2","n5","n66","n77","n260","n261"]},
+  {name:"Vodacom",          hq:"South Africa",  oran:"non_member",      sub:46,   bands:["B8","B3","B42","n78"]},
+  {name:"Ooredoo",          hq:"Qatar",         oran:"non_member",      sub:121,  bands:["B3","B8","B1","n78"]},
+  {name:"T-Mobile",         hq:"United States", oran:"member_active",   sub:130.9,bands:["B2","B12","B71","B5","B4","B66","n71","n41","n260","n261"]},
+  {name:"Viettel",          hq:"Vietnam",       oran:"non_member",      sub:110,  bands:["B3","n78"]},
+  {name:"BSNL Mobile",      hq:"India",         oran:"non_member",      sub:93,   bands:["B3","B5","B28","B1","B41","n28","n78","n258"]},
+  {name:"CMHK",             hq:"Hong Kong",     oran:"non_member",      sub:120,  bands:["B3","B7","B40","n1","n78","n79"]},
+  {name:"MTN Irancell",     hq:"Iran",          oran:"non_member",      sub:92,   bands:["B3","B7","B42","n78"]},
+  {name:"Mobile TeleSystems",hq:"Russia",       oran:"non_member",      sub:84,   bands:["B3","B7","B8","B20","B34","B38","n7","n79","n258"]},
+  {name:"NTT Docomo",       hq:"Japan",         oran:"member_active",   sub:92,   bands:["B28","B18","B26","B19","B8","B11","B21","B3","B1","B42","n1","n28","n78","n77","n79","n257"]},
+  {name:"Rakuten Mobile",   hq:"Japan",         oran:"member_active",   sub:10,   bands:["B3","B18","B28","n3","n77","n257"]},
+  {name:"Globe Telecom",    hq:"Philippines",   oran:"non_member",      sub:54,   bands:["B28","B3","B7","B41","n41","n78"]},
+  {name:"Smart",            hq:"Philippines",   oran:"non_member",      sub:53,   bands:["B1","B3","B5","B28","B40","B41","n28","n41","n78"]},
+  {name:"MegaFon",          hq:"Russia",        oran:"non_member",      sub:71,   bands:["B1","B3","B7","B8","B34","B41","n1","n7","n78","n257","n258"]},
+  {name:"KDDI",             hq:"Japan",         oran:"member_active",   sub:71,   bands:["B28","B18","B26","B19","B8","B11","B21","B3","B1","B42","n28","n3","n78","n77","n79","n257"]},
+  {name:"Softbank",         hq:"Japan",         oran:"member_active",   sub:56,   bands:["B12","B28","B17","B18","B26","B19","B8","B11","B21","B3","B4","B2","B1","B39","B40","B38","B42","B41","n77","n79","n257"]},
+  {name:"SK telecom",       hq:"Korea",         oran:"member_active",   sub:30,   bands:["B1","B3","B5","B7","n78","n257"]},
+  {name:"Chunghwa Telecom", hq:"Taiwan",        oran:"member_active",   sub:13,   bands:["B1","B3","B7","B8","n1","n78"]},
+];
+
+const countries = [
+  {name:"China",               ops:["China Mobile","China Telecom","China Unicom","China Broadcast"]},
+  {name:"Hong Kong",           ops:["CMHK","China Mobile","China Unicom"]},
+  {name:"India",               ops:["Bharti Airtel","Reliance Jio","Vodafone Idea","BSNL Mobile"]},
+  {name:"Pakistan",            ops:["China Mobile","Telenor","du","KPN"]},
+  {name:"Macau",               ops:["China Telecom","CMHK"]},
+  {name:"Japan",               ops:["NTT Docomo","KDDI","Softbank","Rakuten Mobile"]},
+  {name:"United States",       ops:["AT&T","Verizon","T-Mobile"]},
+  {name:"Canada",              ops:["AT&T"]},
+  {name:"Chad",                ops:["Bharti Airtel","du"]},
+  {name:"Bangladesh",          ops:["Bharti Airtel","Telenor","Celcomdigi","KPN"]},
+  {name:"Congo",               ops:["Bharti Airtel","Orange","Vodacom","MTN"]},
+  {name:"Gabon",               ops:["Bharti Airtel","du"]},
+  {name:"Guernsey",            ops:["Bharti Airtel"]},
+  {name:"Jersey",              ops:["Bharti Airtel"]},
+  {name:"Kenya",               ops:["Bharti Airtel","Vodacom","Orange"]},
+  {name:"Madagascar",          ops:["Bharti Airtel","Orange"]},
+  {name:"Malawi",              ops:["Bharti Airtel"]},
+  {name:"Niger",               ops:["Bharti Airtel","Orange","du"]},
+  {name:"Nigeria",             ops:["Bharti Airtel","MTN"]},
+  {name:"Rwanda",              ops:["Bharti Airtel","MTN"]},
+  {name:"Seychelles",          ops:["Bharti Airtel"]},
+  {name:"Sri Lanka",           ops:["Bharti Airtel","Celcomdigi","CMHK"]},
+  {name:"Tanzania",            ops:["Bharti Airtel","Vodafone Group","Vodacom","Viettel"]},
+  {name:"Uganda",              ops:["Bharti Airtel","MTN"]},
+  {name:"Zambia",              ops:["Bharti Airtel","MTN"]},
+  {name:"Argentina",           ops:["Telcel","Movistar"]},
+  {name:"Austria",             ops:["Telcel","Deutsche Telekom","CMHK"]},
+  {name:"Belarus",             ops:["Telcel","Mobile TeleSystems"]},
+  {name:"Brazil",              ops:["Telcel","Vodafone Group","Movistar"]},
+  {name:"Bulgaria",            ops:["Telcel"]},
+  {name:"Chile",               ops:["Telcel","Movistar"]},
+  {name:"Columbia",            ops:["Telcel","Movistar"]},
+  {name:"Costa",               ops:["Telcel"]},
+  {name:"Croatia",             ops:["Telcel","Deutsche Telekom"]},
+  {name:"Dominican Republic",  ops:["Telcel","Orange"]},
+  {name:"Ecuador",             ops:["Telcel","Movistar"]},
+  {name:"El Salvador",         ops:["Telcel"]},
+  {name:"Guatemala",           ops:["Telcel"]},
+  {name:"Honduras",            ops:["Telcel"]},
+  {name:"Liechtenstein",       ops:["Telcel"]},
+  {name:"Mexico",              ops:["Telcel","Movistar","AT&T"]},
+  {name:"Nicaragua",           ops:["Telcel"]},
+  {name:"North Macedonia",     ops:["Telcel","Deutsche Telekom"]},
+  {name:"Panama",              ops:["Telcel"]},
+  {name:"Paraguay",            ops:["Telcel"]},
+  {name:"Peru",                ops:["Telcel","Movistar","Viettel"]},
+  {name:"Puerto Rico",         ops:["Telcel","Deutsche Telekom","Verizon"]},
+  {name:"Serbia",              ops:["Telcel"]},
+  {name:"Slovenia",            ops:["Telcel"]},
+  {name:"Uruguay",             ops:["Telcel","Movistar"]},
+  {name:"Afghanistan",         ops:["MTN","du"]},
+  {name:"Benin",               ops:["MTN","du"]},
+  {name:"Botswana",            ops:["MTN","Orange"]},
+  {name:"Cameroon",            ops:["MTN","Orange","Viettel"]},
+  {name:"Eswatini",            ops:["MTN"]},
+  {name:"Ghana",               ops:["MTN"]},
+  {name:"Guinea",              ops:["MTN","Orange"]},
+  {name:"Guinea Bissau",       ops:["MTN","Orange"]},
+  {name:"Iran",                ops:["MTN","MTN Irancell"]},
+  {name:"Ivory Coast",         ops:["MTN","Orange","du"]},
+  {name:"Liberia",             ops:["MTN"]},
+  {name:"South Africa",        ops:["MTN","Vodafone Group","Vodacom"]},
+  {name:"South Sdan",          ops:["MTN"]},
+  {name:"Sudan",               ops:["MTN","Movistar"]},
+  {name:"Syria",               ops:["MTN"]},
+  {name:"Yemen",               ops:["MTN"]},
+  {name:"Albania",             ops:["Vodafone Group"]},
+  {name:"Australia",           ops:["Vodafone Group"]},
+  {name:"Cyprus",              ops:["Vodafone Group"]},
+  {name:"Czech Republic",      ops:["Vodafone Group","Deutsche Telekom"]},
+  {name:"Egypt",               ops:["Vodafone Group","Orange","du"]},
+  {name:"Fiji",                ops:["Vodafone Group"]},
+  {name:"Germany",             ops:["Vodafone Group","Movistar","Deutsche Telekom"]},
+  {name:"Greece",              ops:["Vodafone Group","Deutsche Telekom"]},
+  {name:"Hungary",             ops:["Vodafone Group","Deutsche Telekom"]},
+  {name:"Iceland",             ops:["Vodafone Group"]},
+  {name:"Ireland",             ops:["Vodafone Group","CMHK"]},
+  {name:"Italy",               ops:["Vodafone Group","CMHK"]},
+  {name:"Iraq",                ops:["Vodafone Group","Orange","Ooredoo"]},
+  {name:"Jordan",              ops:["Vodafone Group","Orange"]},
+  {name:"Netherlands",         ops:["Vodafone Group"]},
+  {name:"New Zealand",         ops:["Vodafone Group"]},
+  {name:"Northan Cyprus",      ops:["Vodafone Group"]},
+  {name:"Portugal",            ops:["Vodafone Group"]},
+  {name:"Qatar",               ops:["Vodafone Group","Ooredoo"]},
+  {name:"Romania",             ops:["Vodafone Group","Orange","Deutsche Telekom"]},
+  {name:"Spain",               ops:["Vodafone Group","Movistar","Orange"]},
+  {name:"Turkey",              ops:["Vodafone Group"]},
+  {name:"Ukraine",             ops:["Vodafone Group","KPN"]},
+  {name:"United Kingdom",      ops:["Vodafone Group","Movistar","CMHK"]},
+  {name:"Venezuela",           ops:["Movistar"]},
+  {name:"Belgium",             ops:["Orange"]},
+  {name:"Central African Republic",ops:["Orange","du"]},
+  {name:"Equatorial Guinea",   ops:["Orange"]},
+  {name:"France",              ops:["Orange"]},
+  {name:"Luxemboug",           ops:["Orange"]},
+  {name:"Mali",                ops:["Orange","du"]},
+  {name:"Moldova",             ops:["Orange"]},
+  {name:"Morocco",             ops:["Orange","du"]},
+  {name:"Poland",              ops:["Orange","Deutsche Telekom"]},
+  {name:"Saudi Arabia",        ops:["Orange","du"]},
+  {name:"Senegal",             ops:["Orange"]},
+  {name:"Slovakia",            ops:["Orange","Deutsche Telekom"]},
+  {name:"Tunisia",             ops:["Orange","Ooredoo"]},
+  {name:"Bosnia and Herzegovina",ops:["Deutsche Telekom"]},
+  {name:"Montenegro",          ops:["Deutsche Telekom"]},
+  {name:"Indonesia",           ops:["Telecomsel","Celcomdigi","Ooredoo","CMHK"]},
+  {name:"East Timor",          ops:["Telecomsel","Viettel"]},
+  {name:"Denmark",             ops:["Telenor","CMHK"]},
+  {name:"Finland",             ops:["Telenor"]},
+  {name:"Malaysia",            ops:["Telenor","Celcomdigi"]},
+  {name:"Norway",              ops:["Telenor"]},
+  {name:"Sweden",              ops:["Telenor","CMHK"]},
+  {name:"Thailand",            ops:["Telenor"]},
+  {name:"Tonga",               ops:["Telenor"]},
+  {name:"Cambodia",            ops:["Celcomdigi","Viettel"]},
+  {name:"Nepal",               ops:["Celcomdigi"]},
+  {name:"Burkina Faso",        ops:["du"]},
+  {name:"Mauritania",          ops:["du"]},
+  {name:"Togo",                ops:["du"]},
+  {name:"United Arab du",      ops:["du"]},
+  {name:"Kazakhstan",          ops:["KPN"]},
+  {name:"Kyrgyzstan",          ops:["KPN"]},
+  {name:"Uzbekistan",          ops:["KPN"]},
+  {name:"Virgin Islands",      ops:["Verizon"]},
+  {name:"Lesotho",             ops:["Vodacom"]},
+  {name:"Mozambique",          ops:["Vodacom","Viettel"]},
+  {name:"Ethiopia",            ops:["Vodacom"]},
+  {name:"Algeria",             ops:["Ooredoo"]},
+  {name:"Kuwait",              ops:["Ooredoo"]},
+  {name:"Maldive",             ops:["Ooredoo"]},
+  {name:"Myanmar",             ops:["Ooredoo","Viettel"]},
+  {name:"Oman",                ops:["Ooredoo"]},
+  {name:"Burundi",             ops:["Viettel"]},
+  {name:"Haiti",               ops:["Viettel"]},
+  {name:"Laos",                ops:["Viettel"]},
+  {name:"Vietnam",             ops:["Viettel","CMHK"]},
+  {name:"Russia",              ops:["Mobile TeleSystems","MegaFon"]},
+  {name:"Armenia",             ops:["Mobile TeleSystems"]},
+  {name:"Philippines",         ops:["Globe Telecom","Smart"]},
+  {name:"Korea",               ops:["SK telecom"]},
+  {name:"Taiwan",              ops:["Chunghwa Telecom"]},
+];
+
+// ── UTILITIES ─────────────────────────────────────────
+function sortBands(list) {
+    return [...list].sort((a, b) => {
+        const aB = a.startsWith('B'), bB = b.startsWith('B');
+        if (aB !== bB) return aB ? -1 : 1;
+        return parseInt(a.slice(1)) - parseInt(b.slice(1));
+    });
+}
+
+function joinStr(arr) {
+    if (!arr || !arr.length) return '';
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return arr[0] + ' and ' + arr[1];
+    return arr.slice(0, -1).join(', ') + ', and ' + arr[arr.length - 1];
+}
+
+function bandInfo(name) { return bands.find(b => b.name === name) || null; }
+
+function freqToBand(freq) {
+    return bands.filter(b => b.min <= freq && freq <= b.max).map(b => b.name);
+}
+
+function freqStr(name) {
+    const b = bandInfo(name);
+    if (!b) return name;
+    return `${b.name}: ${b.min} ~ ${b.max} MHz (${b.max - b.min} MHz)`;
+}
+
+function isMain(name) { return /^B\d{1,2}$/.test(name) || /^n\d{1,3}$/.test(name); }
+
+function bt(name) {
+    const cls = name.startsWith('n') ? 'bt-nr' : 'bt-lte';
+    return `<span class="bt ${cls}">${name}</span>`;
+}
+
+// ── BUILD LISTS ────────────────────────────────────────
+const opBandSet = new Set();
+operators.forEach(op => op.bands.forEach(b => opBandSet.add(b)));
+const multiSelectList = sortBands([...opBandSet]);
+
+const allBandNames = bands.map(b => b.name);
+const operatorList = operators.map(o => o.name).sort();
+const countryNames = [...new Set(countries.map(c => c.name))].sort();
+
+// ── TOM SELECT HELPER ─────────────────────────────────
+function initSelect(id, opts, defaults) {
+    const el = document.getElementById(id);
+    opts.forEach(v => {
+        const o = document.createElement('option');
+        o.value = o.textContent = v;
+        if (defaults.includes(v)) o.selected = true;
+        el.appendChild(o);
+    });
+    return new TomSelect('#' + id, { plugins: ['remove_button'], maxOptions: null });
+}
+
+// ── FREQ → BAND ────────────────────────────────────────
+function updateFreq() {
+    const freq = parseFloat(document.getElementById('freq-input').value);
+    const el = document.getElementById('freq-result');
+    if (isNaN(freq)) { el.innerHTML = ''; return; }
+    const found = freqToBand(freq);
+    if (!found.length) { el.innerHTML = '<div class="freq-result not-found">Not found</div>'; return; }
+    const main = found.filter(isMain), sub = found.filter(n => !isMain(n));
+    let html = '';
+    if (main.length) html += `<div><strong>Main</strong><div class="band-list">${main.map(bt).join('')}</div></div>`;
+    if (sub.length)  html += `<div style="margin-top:6px"><strong>Sub</strong><div class="band-list">${sub.map(bt).join('')}</div></div>`;
+    el.innerHTML = `<div class="freq-result">${html}</div>`;
+}
+
+// ── BAND → FREQ (sidebar) ─────────────────────────────
+function updateBandFreq(sel) {
+    const el = document.getElementById('band-freq-result');
+    if (!sel.length) { el.innerHTML = ''; return; }
+    el.innerHTML = '<ul style="padding-left:16px;margin-top:8px;font-size:13px">' +
+        sel.map(n => `<li>${freqStr(n)}</li>`).join('') + '</ul>';
+}
+
+// ── BAND → OPERATORS ──────────────────────────────────
+function updateBands(sel) {
+    const el = document.getElementById('bands-result');
+    if (!sel.length) { el.innerHTML = ''; return; }
+    const sets = [];
+    let html = '';
+    for (const name of sel) {
+        const b = bandInfo(name);
+        const dup = b ? b.d : '?';
+        const opNames = operators.filter(op => op.bands.includes(name)).map(op => op.name);
+        sets.push(new Set(opNames));
+        html += `<div class="result-item">
+            <p><strong>${freqStr(name)}</strong> — <strong>${dup}</strong> — <strong>${opNames.length}</strong> operators</p>
+            <p>${opNames.length ? joinStr(opNames) : '<em>None found</em>'}</p>
+        </div>`;
+    }
+    if (sel.length > 1) {
+        const ix = sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
+        html += ix.size
+            ? `<div class="common-block"><strong>${joinStr(sel)}</strong> — <strong>${ix.size}</strong> common operator(s)<br><span style="font-size:13px">${joinStr([...ix])}</span></div>`
+            : `<div class="no-common">No common operator in <strong>${joinStr(sel)}</strong></div>`;
+    }
+    el.innerHTML = html;
+}
+
+// ── OPERATOR PROFILE ──────────────────────────────────
+function updateOps(sel) {
+    const el = document.getElementById('operators-result');
+    if (!sel.length) { el.innerHTML = ''; return; }
+    const sets = [];
+    let html = '';
+    for (const name of sel) {
+        const op = operators.find(o => o.name === name);
+        if (!op) continue;
+        const ctrs = [...new Set(countries.filter(c => c.ops.includes(name)).map(c => c.name))];
+        const sorted = sortBands(op.bands);
+        sets.push(new Set(op.bands));
+        const badge = op.oran === 'member_active'
+            ? '<span class="badge badge-active">O-RAN Active</span>'
+            : op.oran === 'member_inactive'
+            ? '<span class="badge badge-member">O-RAN Member</span>' : '';
+        html += `<div class="result-item">
+            <p><strong>${name}</strong>${badge} &nbsp;·&nbsp; ${op.hq} &nbsp;·&nbsp; ${op.sub}M subscribers</p>
+            <p style="color:var(--muted);font-size:13px">Operates in: ${ctrs.length ? joinStr(ctrs) : 'N/A'}</p>
+            <div class="band-list">${sorted.map(bt).join('')}</div>
+        </div>`;
+    }
+    if (sel.length > 1 && sets.length > 1) {
+        const ix = sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
+        const sorted = sortBands([...ix]);
+        html += ix.size
+            ? `<div class="common-block"><strong>${joinStr(sel)}</strong> — <strong>${ix.size}</strong> common band(s)<div class="band-list" style="margin-top:6px">${sorted.map(bt).join('')}</div></div>`
+            : `<div class="no-common">No common band between <strong>${joinStr(sel)}</strong></div>`;
+    }
+    el.innerHTML = html;
+}
+
+// ── OPERATORS PER COUNTRY ─────────────────────────────
+function updateCountries(sel) {
+    const el = document.getElementById('countries-result');
+    if (!sel.length) { el.innerHTML = ''; return; }
+    let html = '';
+    for (const name of sel) {
+        const opSet = new Set();
+        countries.filter(c => c.name === name).forEach(c => c.ops.forEach(o => opSet.add(o)));
+        const ops = [...opSet];
+        html += `<div class="result-item">
+            <p><strong>${name}</strong> — ${ops.length} operator(s)</p>
+            <p>${joinStr(ops)}</p>
+        </div>`;
+    }
+    el.innerHTML = html;
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('freq-input').addEventListener('input', updateFreq);
+    updateFreq();
+
+    const tsBandFreq = initSelect('band-freq-select', allBandNames, ['B42','n77','B77D']);
+    tsBandFreq.on('change', () => updateBandFreq(tsBandFreq.getValue()));
+    updateBandFreq(tsBandFreq.getValue());
+
+    const tsBands = initSelect('bands-select', multiSelectList, ['B1','n77','n41']);
+    tsBands.on('change', () => updateBands(tsBands.getValue()));
+    updateBands(tsBands.getValue());
+
+    const tsOps = initSelect('operators-select', operatorList, ['Verizon','Bharti Airtel']);
+    tsOps.on('change', () => updateOps(tsOps.getValue()));
+    updateOps(tsOps.getValue());
+
+    const tsCtr = initSelect('countries-select', countryNames, ['United States','India','Japan']);
+    tsCtr.on('change', () => updateCountries(tsCtr.getValue()));
+    updateCountries(tsCtr.getValue());
+});
+</script>
+</body>
+</html>
